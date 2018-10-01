@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -26,7 +27,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
 
     private RecyclerView mRecipeListRecyclerView;
     private RecipeAdapter mRecipeAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    //private RecyclerView.LayoutManager mLayoutManager;
+    //private GridLayoutManager mLayoutManager;
     private BakingViewModel viewModel;
 
     @Override
@@ -40,11 +42,11 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         viewModel = ViewModelProviders.of(this).get(BakingViewModel.class);
 
         // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecipeListRecyclerView.setLayoutManager(mLayoutManager);
+        //mLayoutManager = new GridLayoutManager(this,1);
+        //mRecipeListRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mRecipeAdapter = new RecipeAdapter();
+        mRecipeAdapter = new RecipeAdapter(this);
         mRecipeAdapter.setClickListener(this);
         mRecipeListRecyclerView.setAdapter(mRecipeAdapter);
 

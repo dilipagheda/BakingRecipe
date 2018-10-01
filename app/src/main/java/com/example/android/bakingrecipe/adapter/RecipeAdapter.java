@@ -1,5 +1,6 @@
 package com.example.android.bakingrecipe.adapter;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,7 +17,8 @@ import java.util.ArrayList;
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private ArrayList<Recipe> mDataset;
     private ItemClickListener clickListener;
-
+    private int[] placeHolderImages;
+    private Context context;
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -27,7 +29,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         public RecipeViewHolder(RecipeListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.recipeName.setOnClickListener(this);
+            binding.cardView.setOnClickListener(this);
         }
 
         @Override
@@ -37,8 +39,17 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         }
     }
 
-    public RecipeAdapter() {
+    public RecipeAdapter(Context context) {
+        this.context = context;
         mDataset = new ArrayList<>();
+        //Note: Below images are just placeholder as backend doesn't return such images.
+        //It is used to practice cardLayout with image and text for learning purpose.
+        placeHolderImages = new int[]{
+          R.drawable.dessert1,
+          R.drawable.dessert2,
+          R.drawable.dessert3,
+          R.drawable.dessert4
+        };
     }
 
     public void setData(ArrayList<Recipe> mDataset){
@@ -61,7 +72,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.binding.recipeName.setText(mDataset.get(position).getName());
-
+        holder.binding.imageView.setImageResource(placeHolderImages[position%4]);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

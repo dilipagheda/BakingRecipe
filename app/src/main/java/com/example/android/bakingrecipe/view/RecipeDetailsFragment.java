@@ -25,7 +25,8 @@ public class RecipeDetailsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_RECIPE = "recipe";
-
+    private static final String ARG_DUAL = "dual";
+    private boolean isDualMode;
     private Recipe mRecipe;
 
     public RecipeDetailsFragment() {
@@ -41,10 +42,11 @@ public class RecipeDetailsFragment extends Fragment {
      * @return A new instance of fragment RecipeDetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static RecipeDetailsFragment newInstance(Recipe recipe) {
+    public static RecipeDetailsFragment newInstance(Recipe recipe, boolean isDualMode) {
         RecipeDetailsFragment fragment = new RecipeDetailsFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_RECIPE, recipe);
+        args.putBoolean(ARG_DUAL,isDualMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,6 +56,7 @@ public class RecipeDetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mRecipe = getArguments().getParcelable(ARG_RECIPE);
+            isDualMode =  getArguments().getBoolean(ARG_DUAL);
         }
     }
 
@@ -68,6 +71,7 @@ public class RecipeDetailsFragment extends Fragment {
         RecipeDetailsFragmentAdaptor adapter = new RecipeDetailsFragmentAdaptor(fm,new String[]{"Ingredients",
                 "Steps"});
         adapter.setRecipe(mRecipe);
+        adapter.setDualMode(isDualMode);
         viewPager.setAdapter(adapter);
 
         // Give the TabLayout the ViewPager

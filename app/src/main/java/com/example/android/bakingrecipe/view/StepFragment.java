@@ -1,6 +1,7 @@
 package com.example.android.bakingrecipe.view;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import com.example.android.bakingrecipe.R;
 import com.example.android.bakingrecipe.adapter.IngredientAdapter;
 import com.example.android.bakingrecipe.adapter.ItemClickListener;
 import com.example.android.bakingrecipe.adapter.StepAdapter;
+import com.example.android.bakingrecipe.adapter.StepFragmentClickListener;
 import com.example.android.bakingrecipe.databinding.StepListBinding;
 import com.example.android.bakingrecipe.model.Ingredient;
 import com.example.android.bakingrecipe.model.Recipe;
@@ -31,7 +33,11 @@ public class StepFragment extends Fragment implements ItemClickListener{
     private RecyclerView mStepListRecyclerView;
     private StepAdapter mStepAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private static Recipe recipe;
+    private Recipe recipe;
+    private static final String ARG_RECIPE = "recipe";
+    private static final String ARG_DUAL = "dual";
+    private StepFragmentClickListener stepFragmentClickListener;
+    private boolean isDualMode;
 
     public StepFragment() {
         // Required empty public constructor
@@ -46,16 +52,24 @@ public class StepFragment extends Fragment implements ItemClickListener{
      * @return A new instance of fragment StepFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static StepFragment newInstance(Recipe recipe) {
+    public static StepFragment newInstance(Recipe recipe,boolean isDualMode) {
         StepFragment fragment = new StepFragment();
-        StepFragment.recipe = recipe;
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_RECIPE, recipe);
+        args.putBoolean(ARG_DUAL,isDualMode);
+
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            recipe = getArguments().getParcelable(ARG_RECIPE);
+            isDualMode = getArguments().getBoolean(ARG_DUAL);
 
+        }
     }
 
     @Override
@@ -80,8 +94,24 @@ public class StepFragment extends Fragment implements ItemClickListener{
 
     @Override
     public void onClick(View view, int position) {
-        Intent i = new Intent(this.getContext(),StepDetailsActivity.class);
-        i.putExtra("Step",recipe.getSteps().get(position));
-        startActivity(i);
+        if(!isDualMode){
+            Intent i = new Intent(this.getContext(),StepDetailsActivity.class);
+            i.putExtra("Step",recipe.getSteps().get(position));
+            startActivity(i);
+        }else{
+            //call parent activity to replace step details fragment
+            stepFragmentClickListener.onClick(position);
+        }
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            stepFragmentClickListener = (StepFragmentClickListener) context;
+        } catch (ClassCastException castException) {
+            /** The activity does not implement the listener. */
+        }
     }
 }

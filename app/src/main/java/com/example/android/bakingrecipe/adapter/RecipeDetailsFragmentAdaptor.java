@@ -14,6 +14,11 @@ public class RecipeDetailsFragmentAdaptor extends FragmentPagerAdapter {
 
     private String title[];
     private Recipe recipe;
+    private boolean isDualMode;
+
+    public void setDualMode(boolean dualMode) {
+        isDualMode = dualMode;
+    }
 
     public RecipeDetailsFragmentAdaptor(FragmentManager fm, String[] title) {
         super(fm);
@@ -28,7 +33,7 @@ public class RecipeDetailsFragmentAdaptor extends FragmentPagerAdapter {
                 f = IngredientFragment.newInstance(recipe);
                 break;
             case 1:
-                f = StepFragment.newInstance(recipe);
+                f = StepFragment.newInstance(recipe,isDualMode);
                 break;
 
         }

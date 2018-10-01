@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.bakingrecipe.R;
@@ -26,6 +27,8 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import static com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
 
@@ -44,6 +47,7 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
     private static final String ARG_STEP = "step";
     private static final String ARG_DUAL = "dual";
     private boolean isDualMode;
+    private ImageView imageView;
 
     public StepDetailsFragment() {
         // Required empty public constructor
@@ -84,6 +88,7 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
         StepDetailsBinding binding = StepDetailsBinding.inflate(inflater,container,false);
 
         playerView = (SimpleExoPlayerView) binding.videoView;
+        imageView = binding.imageView;
 
         orientation = getResources().getConfiguration().orientation;
         playerView.setResizeMode(RESIZE_MODE_ZOOM);
@@ -115,18 +120,46 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
                 new DefaultRenderersFactory(getContext()),
                 new DefaultTrackSelector(), new DefaultLoadControl());
 
-        Uri uri = Uri.parse(step.getVideoURL());
-        DefaultDataSourceFactory mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), "BakingRecipe"));
+        String videoURL = step.getVideoURL();
+        String thumbnailURL = step.getThumbnailURL();
+        if(videoURL.isEmpty()){
+            playerView.setVisibility(View.GONE);
+            imageView.setVisibility(View.VISIBLE);
+            if(thumbnailURL.isEmpty()){
+                imageView.setImageResource(R.drawable.ic_error_black_24dp);
 
-        MediaSource mediaSource = new ExtractorMediaSource.Factory(mediaDataSourceFactory)
-                .createMediaSource(uri);
+            }else{
+                Picasso.with(getContext())
+                        .load(thumbnailURL)
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
 
-        player.prepare(mediaSource, true, false);
-        player.setPlayWhenReady(true);
-        player.seekTo(player.getCurrentWindowIndex(), player.getCurrentPosition());
+                            }
 
-        playerView.setPlayer(player);
+                            @Override
+                            public void onError() {
+                                imageView.setImageResource(R.drawable.ic_error_black_24dp);
+                            }
+                        });
+            }
 
+        }else{
+            playerView.setVisibility(View.VISIBLE);
+            imageView.setVisibility(View.GONE);
+
+            Uri uri = Uri.parse(videoURL);
+            DefaultDataSourceFactory mediaDataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), "BakingRecipe"));
+
+            MediaSource mediaSource = new ExtractorMediaSource.Factory(mediaDataSourceFactory)
+                    .createMediaSource(uri);
+
+            player.prepare(mediaSource, true, false);
+            player.setPlayWhenReady(true);
+            player.seekTo(player.getCurrentWindowIndex(), player.getCurrentPosition());
+
+            playerView.setPlayer(player);
+            }
 
     }
 
