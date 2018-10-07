@@ -1,20 +1,19 @@
 package com.example.android.bakingrecipe.view;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.android.bakingrecipe.adapter.IngredientAdapter;
-import com.example.android.bakingrecipe.adapter.ItemClickListener;
-import com.example.android.bakingrecipe.adapter.RecipeAdapter;
 import com.example.android.bakingrecipe.databinding.IngredientListBinding;
-import com.example.android.bakingrecipe.model.Ingredient;
 import com.example.android.bakingrecipe.model.Recipe;
 
 
@@ -24,15 +23,12 @@ import com.example.android.bakingrecipe.model.Recipe;
  * create an instance of this fragment.
  */
 public class IngredientFragment extends Fragment{
-
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-    private static Recipe recipe;
     private RecyclerView mIngredientListRecyclerView;
     private IngredientAdapter mIngredientAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private static final String ARG_RECIPE = "recipe";
+
+    private Recipe mRecipe;
 
     public IngredientFragment() {
         // Required empty public constructor
@@ -46,19 +42,21 @@ public class IngredientFragment extends Fragment{
      * @param param2 Parameter 2.
      * @return A new instance of fragment IngredientFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static IngredientFragment newInstance(Recipe r) {
         IngredientFragment fragment = new IngredientFragment();
-        recipe=r;
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_RECIPE, r);
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mRecipe = getArguments().getParcelable(ARG_RECIPE);
+        }
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,17 +66,22 @@ public class IngredientFragment extends Fragment{
         mIngredientListRecyclerView = ingredientListBinding.ingredientRecyclerView;
         mIngredientListRecyclerView.setHasFixedSize(true);
 
+//        if(mRecipe==null){
+//            //hmm. seems like fragment is being restored and our mRecipe is wiped out.
+//            //Let's get it back from parent activity
+//            //(I tried to use viewModel and savedInstanceState but they didn't work reliably for a fragment:-()
+//            RecipeDetailsActivity recipeDetailsActivity = (RecipeDetailsActivity)getActivity();
+//            mRecipe = recipeDetailsActivity.getRecipe();
+//        }
+        mIngredientAdapter = new IngredientAdapter(mRecipe.getIngredients());
+        mIngredientListRecyclerView.setAdapter(mIngredientAdapter);
+
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(container.getContext());
         mIngredientListRecyclerView.setLayoutManager(mLayoutManager);
 
-
-
-        // specify an adapter (see also next example)
-        mIngredientAdapter = new IngredientAdapter(recipe.getIngredients());
-        mIngredientListRecyclerView.setAdapter(mIngredientAdapter);
-
         return ingredientListBinding.getRoot();
     }
+
 
 }

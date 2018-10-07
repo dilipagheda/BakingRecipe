@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.bakingrecipe.R;
 import com.example.android.bakingrecipe.adapter.IngredientAdapter;
@@ -21,6 +22,8 @@ import com.example.android.bakingrecipe.databinding.StepListBinding;
 import com.example.android.bakingrecipe.model.Ingredient;
 import com.example.android.bakingrecipe.model.Recipe;
 import com.example.android.bakingrecipe.model.Step;
+
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -38,6 +41,7 @@ public class StepFragment extends Fragment implements ItemClickListener{
     private static final String ARG_DUAL = "dual";
     private StepFragmentClickListener stepFragmentClickListener;
     private boolean isDualMode;
+    private int currentPosition;
 
     public StepFragment() {
         // Required empty public constructor
@@ -85,7 +89,7 @@ public class StepFragment extends Fragment implements ItemClickListener{
         mStepListRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        mStepAdapter = new StepAdapter(recipe.getSteps());
+        mStepAdapter = new StepAdapter(recipe.getSteps(),getContext());
         mStepAdapter.setClickListener(this);
         mStepListRecyclerView.setAdapter(mStepAdapter);
 
@@ -96,13 +100,26 @@ public class StepFragment extends Fragment implements ItemClickListener{
     public void onClick(View view, int position) {
         if(!isDualMode){
             Intent i = new Intent(this.getContext(),StepDetailsActivity.class);
-            i.putExtra("Step",recipe.getSteps().get(position));
-            startActivity(i);
+            i.putExtra("currentPosition",position);
+            i.putParcelableArrayListExtra("Steps",recipe.getSteps());
+            startActivityForResult(i,1);
         }else{
             //call parent activity to replace step details fragment
             stepFragmentClickListener.onClick(position);
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                currentPosition=data.getIntExtra("currentPosition",0);
+                mStepAdapter.setCurrentPosition(currentPosition);
+                mStepAdapter.notifyDataSetChanged();
+                //Toast.makeText(getActivity(),"pos:"+currentPosition,Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override

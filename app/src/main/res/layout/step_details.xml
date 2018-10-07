@@ -24,8 +24,36 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_margin="8dp"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:scrollbars="vertical"
         android:id="@+id/description"
         android:layout_weight="1"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        >
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:scaleType="centerCrop"
+            android:background="@color/colorAccent"
+            android:id="@+id/previousStep"
+            android:src="@drawable/ic_arrow_back_black_24dp"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:scaleType="centerCrop"
+            android:background="@color/colorAccent"
+            android:id="@+id/nextStep"
+            android:src="@drawable/ic_arrow_forward_black_24dp"/>
+    </RelativeLayout>
 
 </LinearLayout>
 </layout>

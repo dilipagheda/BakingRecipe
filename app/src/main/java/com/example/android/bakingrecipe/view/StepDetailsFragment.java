@@ -1,11 +1,13 @@
 package com.example.android.bakingrecipe.view;
 
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -30,6 +32,8 @@ import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import static com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
 
 /**
@@ -42,13 +46,16 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
     SimpleExoPlayer player;
     int orientation;
     boolean isFullScreen=false;
-    Step step;
+    ArrayList<Step> steps;
 
-    private static final String ARG_STEP = "step";
+    private static final String ARG_STEPS = "steps";
     private static final String ARG_DUAL = "dual";
+    private static final String ARG_CURRENT_POSITION = "currentposition";
+    private StepDetailsBinding binding;
     private boolean isDualMode;
     private ImageView imageView;
-
+    private static String TAG="StepDetailsFragment";
+    private int currentPosition;
     public StepDetailsFragment() {
         // Required empty public constructor
     }
@@ -62,10 +69,11 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
      * @return A new instance of fragment StepDetailsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static StepDetailsFragment newInstance(Step step,boolean isDualMode) {
+    public static StepDetailsFragment newInstance(ArrayList<Step> steps, int currentPosition, boolean isDualMode) {
         StepDetailsFragment fragment = new StepDetailsFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_STEP, step);
+        args.putInt(ARG_CURRENT_POSITION,currentPosition);
+        args.putParcelableArrayList(ARG_STEPS, steps);
         args.putBoolean(ARG_DUAL,isDualMode);
 
         fragment.setArguments(args);
@@ -76,7 +84,8 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            step = getArguments().getParcelable(ARG_STEP);
+            steps = getArguments().getParcelableArrayList(ARG_STEPS);
+            currentPosition = getArguments().getInt(ARG_CURRENT_POSITION);
             isDualMode = getArguments().getBoolean(ARG_DUAL);
 
         }
@@ -85,7 +94,7 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        StepDetailsBinding binding = StepDetailsBinding.inflate(inflater,container,false);
+        binding = StepDetailsBinding.inflate(inflater,container,false);
 
         playerView = (SimpleExoPlayerView) binding.videoView;
         imageView = binding.imageView;
@@ -109,7 +118,11 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
             isFullScreen = true;
         } else {
             // In portrait
-            binding.description.setText(step.getDescription());
+            binding.description.setText(steps.get(currentPosition).getDescription());
+
+            //set-up click listeners on back/forward buttons
+            binding.nextStep.setOnClickListener(new NavigationClickListener(true));
+            binding.previousStep.setOnClickListener(new NavigationClickListener(false));
         }
         return binding.getRoot();
     }
@@ -120,6 +133,7 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
                 new DefaultRenderersFactory(getContext()),
                 new DefaultTrackSelector(), new DefaultLoadControl());
 
+        Step step = steps.get(currentPosition);
         String videoURL = step.getVideoURL();
         String thumbnailURL = step.getThumbnailURL();
         if(videoURL.isEmpty()){
@@ -165,9 +179,12 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
 
 
     private void releasePlayer() {
+
         if (player != null) {
             player.release();
             player = null;
+            Log.d(TAG,"releasePlayer");
+
         }
     }
 
@@ -176,6 +193,8 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
         super.onStart();
         if (Util.SDK_INT > 23) {
             initializePlayer();
+            Log.d(TAG,"onStart >23");
+
         }
     }
 
@@ -184,6 +203,8 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
         super.onResume();
         if ((Util.SDK_INT <= 23 || player == null)) {
             initializePlayer();
+            Log.d(TAG,"onStart <=23");
+
         }
     }
 
@@ -192,6 +213,8 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
         super.onPause();
         if (Util.SDK_INT <= 23) {
             releasePlayer();
+            Log.d(TAG,"onPause <=23");
+
         }
     }
 
@@ -200,6 +223,8 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
         super.onStop();
         if (Util.SDK_INT > 23) {
             releasePlayer();
+            Log.d(TAG,"onStop >23");
+
         }
     }
 
@@ -252,6 +277,52 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
         return false;
+    }
+
+
+
+
+    private class NavigationClickListener implements View.OnClickListener {
+        private boolean isForward;
+
+        public NavigationClickListener(boolean isForward) {
+            this.isForward = isForward;
+        }
+
+        @Override
+        public void onClick(View view) {
+            StepDetailsActivity stepDetailsActivity = (StepDetailsActivity)getActivity();
+
+            if(isForward){
+                currentPosition++;
+                if(currentPosition >= steps.size()){
+                    currentPosition = steps.size()-1;
+                    binding.nextStep.setEnabled(false);
+                }else{
+                    binding.previousStep.setEnabled(true);
+                    stepDetailsActivity.setCurrentPosition(currentPosition);
+                    releasePlayer();
+                    initializePlayer();
+                    binding.description.setText(steps.get(currentPosition).getDescription());
+                }
+
+            }else{
+                currentPosition--;
+                if(currentPosition<0){
+                    currentPosition=0;
+                    binding.previousStep.setEnabled(false);
+                }else{
+                    binding.nextStep.setEnabled(true);
+                    stepDetailsActivity.setCurrentPosition(currentPosition);
+                    releasePlayer();
+                    initializePlayer();
+                    binding.description.setText(steps.get(currentPosition).getDescription());
+                }
+
+
+            }
+
+        }
     }
 }
 
