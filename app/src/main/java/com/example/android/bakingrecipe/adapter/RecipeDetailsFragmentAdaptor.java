@@ -31,6 +31,7 @@ public class RecipeDetailsFragmentAdaptor extends FragmentPagerAdapter {
         switch(position){
             case 0:
                 f = IngredientFragment.newInstance(recipe);
+                
                 break;
             case 1:
                 f = StepFragment.newInstance(recipe,isDualMode);

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.example.android.bakingrecipe.R;
 import com.example.android.bakingrecipe.adapter.ItemClickListener;
@@ -36,8 +37,6 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
 
     private RecyclerView mRecipeListRecyclerView;
     private RecipeAdapter mRecipeAdapter;
-    //private RecyclerView.LayoutManager mLayoutManager;
-    //private GridLayoutManager mLayoutManager;
     private BakingViewModel viewModel;
     private boolean doesWidgetContainValue;
 
@@ -50,10 +49,6 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
 
         //get view model
         viewModel = ViewModelProviders.of(this).get(BakingViewModel.class);
-
-        // use a linear layout manager
-        //mLayoutManager = new GridLayoutManager(this,1);
-        //mRecipeListRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
         mRecipeAdapter = new RecipeAdapter(this);
@@ -85,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
             @Override
             public void onChanged(@Nullable StatusCodes statusCodes) {
                 //handle status code here
+                if(statusCodes==StatusCodes.NETWORK_FAILURE){
+                    Toast.makeText(getApplicationContext(),"Network error!",Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

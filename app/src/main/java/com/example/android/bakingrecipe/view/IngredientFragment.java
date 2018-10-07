@@ -34,14 +34,6 @@ public class IngredientFragment extends Fragment{
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment IngredientFragment.
-     */
     public static IngredientFragment newInstance(Recipe r) {
         IngredientFragment fragment = new IngredientFragment();
         Bundle args = new Bundle();
@@ -66,19 +58,8 @@ public class IngredientFragment extends Fragment{
         mIngredientListRecyclerView = ingredientListBinding.ingredientRecyclerView;
         mIngredientListRecyclerView.setHasFixedSize(true);
 
-//        if(mRecipe==null){
-//            //hmm. seems like fragment is being restored and our mRecipe is wiped out.
-//            //Let's get it back from parent activity
-//            //(I tried to use viewModel and savedInstanceState but they didn't work reliably for a fragment:-()
-//            RecipeDetailsActivity recipeDetailsActivity = (RecipeDetailsActivity)getActivity();
-//            mRecipe = recipeDetailsActivity.getRecipe();
-//        }
         mIngredientAdapter = new IngredientAdapter(mRecipe.getIngredients());
         mIngredientListRecyclerView.setAdapter(mIngredientAdapter);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(container.getContext());
-        mIngredientListRecyclerView.setLayoutManager(mLayoutManager);
 
         return ingredientListBinding.getRoot();
     }

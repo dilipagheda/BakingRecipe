@@ -96,6 +96,9 @@ public class IntegrationInstrumentedTest {
             "6. Pour the filling into the prepared crust and smooth the top. Spread the whipped cream over the filling. Refrigerate the pie for at least 2 hours."
     };
 
+    private boolean phone_landscape, phone_portrait;
+    private boolean tablet_landscape, tablet_portrait;
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
             MainActivity.class,true,true);
@@ -103,7 +106,11 @@ public class IntegrationInstrumentedTest {
     @Before
     public void setUp(){
         mActivity = mActivityRule.getActivity();
-        mIsScreenSw600dp = isScreenSw600dp();
+        phone_landscape = mActivity.getResources().getBoolean(R.bool.phoneLandscape);
+        phone_portrait = mActivity.getResources().getBoolean(R.bool.phonePortrait);
+        tablet_landscape = mActivity.getResources().getBoolean(R.bool.tabletLandscape);
+        tablet_portrait = mActivity.getResources().getBoolean(R.bool.tabletPortrait);
+
     }
 
     @After
@@ -123,7 +130,7 @@ public class IntegrationInstrumentedTest {
                 .check(matches(isDisplayed()));
 
         //if it is a tablet then verify that step details is also present
-        if(mIsScreenSw600dp){
+        if(tablet_portrait || tablet_landscape){
 
             onView(withId(R.id.step_details_container))
                     .check(matches(isDisplayed()));
@@ -138,7 +145,7 @@ public class IntegrationInstrumentedTest {
                         click()));
 
         //Verify that ingredients match up for that recipe by scrolling to that element using a custom matcher
-        // If an ingradient is not there, then test will fail indicating that can't find the view
+        // If an ingredient is not there, then test will fail indicating that can't find the view
 
         for(String s:ingredientsOfNutellaPie){
             onView(withId(R.id.ingredientRecyclerView)).perform(
@@ -192,25 +199,19 @@ public class IntegrationInstrumentedTest {
             onView(withId(R.id.stepRecyclerView)).perform(
                     RecyclerViewActions.actionOnItemAtPosition(i,click()));
 
-            onView(withId(R.id.description))
-                    .check(matches(withStepDetailedDescription(detailedStepsOfNutellaPie[i])));
+            //do below only for phone - landscape
+            if(!phone_landscape){
+                onView(withId(R.id.description))
+                        .check(matches(withStepDetailedDescription(detailedStepsOfNutellaPie[i])));
+            }
 
-            if(!mIsScreenSw600dp){
+            //do below only for phones and not tablet
+            if(phone_landscape || phone_portrait){
                 //go back to previous screen
                 Espresso.pressBack();
             }
         }
 
-    }
-
-
-    private boolean isScreenSw600dp() {
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        mActivity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float widthDp = displayMetrics.widthPixels / displayMetrics.density;
-        float heightDp = displayMetrics.heightPixels / displayMetrics.density;
-        float screenSw = Math.min(widthDp, heightDp);
-        return screenSw >= 600;
     }
 
     public static BoundedMatcher<View,TextView> withStepDetailedDescription(final String text) {

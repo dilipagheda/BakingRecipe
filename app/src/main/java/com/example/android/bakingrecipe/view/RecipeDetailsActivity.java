@@ -33,6 +33,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements StepFrag
     private FrameLayout recipeDetailsContainer;
     private RecipeViewModel recipeViewModel;
     private static String ARG_RECIPE="recipe";
+    private RecipeDetailsFragment recipeDetailsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,21 +59,31 @@ public class RecipeDetailsActivity extends AppCompatActivity implements StepFrag
            insertStepDetailsFragment(0,false);
         }
 
-        RecipeDetailsFragment recipeDetailsFragment = RecipeDetailsFragment.newInstance(recipe,isDualMode);
         // Add the fragment to the 'fragment_container' FrameLayout
-        getSupportFragmentManager().beginTransaction()
-                .add(recipeDetailsContainer.getId(), recipeDetailsFragment).commit();
+        if(getSupportFragmentManager().findFragmentById(recipeDetailsContainer.getId())==null){
+            recipeDetailsFragment = RecipeDetailsFragment.newInstance(recipe,isDualMode);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(recipeDetailsContainer.getId(), recipeDetailsFragment).commit();
+        }
+
 
 
     }
 
     private void insertStepDetailsFragment(int position,boolean isReplace) {
-        StepDetailsFragment stepDetailsFragment = StepDetailsFragment.newInstance(recipe.getSteps(),position,isDualMode);
+        StepDetailsFragment stepDetailsFragment;
 
         if(!isReplace){
-            getSupportFragmentManager().beginTransaction()
-                    .add(stepDetailsContainer.getId(), stepDetailsFragment).commit();
+            if(getSupportFragmentManager().findFragmentById(stepDetailsContainer.getId())==null){
+                stepDetailsFragment = StepDetailsFragment.newInstance(recipe.getSteps(),position,isDualMode);
+
+                getSupportFragmentManager().beginTransaction()
+                        .add(stepDetailsContainer.getId(), stepDetailsFragment).commit();
+            }
+
         }else{
+            stepDetailsFragment = StepDetailsFragment.newInstance(recipe.getSteps(),position,isDualMode);
             getSupportFragmentManager().beginTransaction()
                     .replace(stepDetailsContainer.getId(), stepDetailsFragment).commit();
         }
@@ -95,11 +106,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements StepFrag
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    public Recipe getRecipe() {
-//        return recipeViewModel.getRecipe();
-//    }
-
 
 
 }

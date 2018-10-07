@@ -41,7 +41,7 @@ import static com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MOD
  * Use the {@link StepDetailsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StepDetailsFragment extends Fragment implements GestureDetector.OnGestureListener  {
+public class StepDetailsFragment extends Fragment  {
     SimpleExoPlayerView playerView;
     SimpleExoPlayer player;
     int orientation;
@@ -60,15 +60,6 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment StepDetailsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static StepDetailsFragment newInstance(ArrayList<Step> steps, int currentPosition, boolean isDualMode) {
         StepDetailsFragment fragment = new StepDetailsFragment();
         Bundle args = new Bundle();
@@ -120,9 +111,12 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
             // In portrait
             binding.description.setText(steps.get(currentPosition).getDescription());
 
-            //set-up click listeners on back/forward buttons
-            binding.nextStep.setOnClickListener(new NavigationClickListener(true));
-            binding.previousStep.setOnClickListener(new NavigationClickListener(false));
+            if(!isDualMode){
+                //set-up click listeners on back/forward buttons
+                binding.nextStep.setOnClickListener(new NavigationClickListener(true));
+                binding.previousStep.setOnClickListener(new NavigationClickListener(false));
+            }
+
         }
         return binding.getRoot();
     }
@@ -227,60 +221,6 @@ public class StepDetailsFragment extends Fragment implements GestureDetector.OnG
 
         }
     }
-
-
-    @Override
-    public boolean onDown(MotionEvent motionEvent) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent motionEvent) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent motionEvent) {
-        if (orientation == Configuration.ORIENTATION_PORTRAIT || !isDualMode) {
-            return false;
-        }
-        View decorView = getActivity().getWindow().getDecorView();
-        if (isFullScreen) {
-            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            isFullScreen = false;
-        } else {
-            isFullScreen = true;
-            decorView.setSystemUiVisibility(
-                    // Set the content to appear under the system bars so that the
-                    // content doesn't resize when the system bars hide and show.
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            // Hide the nav bar and status bar
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent motionEvent) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-        return false;
-    }
-
-
-
 
     private class NavigationClickListener implements View.OnClickListener {
         private boolean isForward;

@@ -58,6 +58,7 @@ public class StepFragment extends Fragment implements ItemClickListener{
     // TODO: Rename and change types and number of parameters
     public static StepFragment newInstance(Recipe recipe,boolean isDualMode) {
         StepFragment fragment = new StepFragment();
+
         Bundle args = new Bundle();
         args.putParcelable(ARG_RECIPE, recipe);
         args.putBoolean(ARG_DUAL,isDualMode);
@@ -84,15 +85,15 @@ public class StepFragment extends Fragment implements ItemClickListener{
         mStepListRecyclerView = stepListBinding.stepRecyclerView;
         mStepListRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(container.getContext());
-        mStepListRecyclerView.setLayoutManager(mLayoutManager);
-
         // specify an adapter (see also next example)
         mStepAdapter = new StepAdapter(recipe.getSteps(),getContext());
         mStepAdapter.setClickListener(this);
         mStepListRecyclerView.setAdapter(mStepAdapter);
 
+        if(isDualMode){
+            mStepAdapter.setCurrentPosition(0);
+            mStepAdapter.notifyDataSetChanged();
+        }
         return stepListBinding.getRoot();
     }
 
@@ -106,6 +107,8 @@ public class StepFragment extends Fragment implements ItemClickListener{
         }else{
             //call parent activity to replace step details fragment
             stepFragmentClickListener.onClick(position);
+            mStepAdapter.setCurrentPosition(position);
+            mStepAdapter.notifyDataSetChanged();
         }
 
     }
@@ -117,7 +120,6 @@ public class StepFragment extends Fragment implements ItemClickListener{
                 currentPosition=data.getIntExtra("currentPosition",0);
                 mStepAdapter.setCurrentPosition(currentPosition);
                 mStepAdapter.notifyDataSetChanged();
-                //Toast.makeText(getActivity(),"pos:"+currentPosition,Toast.LENGTH_SHORT).show();
             }
         }
     }

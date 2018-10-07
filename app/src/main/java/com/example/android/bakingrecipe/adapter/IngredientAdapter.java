@@ -53,8 +53,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.binding.ingredient.setText(mDataset.get(position).getIngredient());
-        holder.binding.measure.setText(mDataset.get(position).getMeasure());
-        holder.binding.quantity.setText(String.valueOf(mDataset.get(position).getQuantity()));
+        holder.binding.measureQuantity.setText(getQtyMeasure(position));
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -63,6 +63,11 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         return mDataset.size();
     }
 
+    private String getQtyMeasure(int p){
+        String q = String.valueOf(mDataset.get(p).getQuantity());
+        String m = mDataset.get(p).getMeasure();
+        return q+" "+m;
+    }
 
 }
 

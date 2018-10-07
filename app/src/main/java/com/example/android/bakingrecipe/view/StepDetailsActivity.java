@@ -67,7 +67,6 @@ public class StepDetailsActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
                 Intent intent = new Intent();
                 intent.putExtra("currentPosition", currentPosition);
 

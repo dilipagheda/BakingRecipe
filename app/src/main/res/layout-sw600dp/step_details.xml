@@ -30,7 +30,5 @@
         android:id="@+id/description"
         android:layout_weight="1"/>
 
-
-
 </LinearLayout>
 </layout>
