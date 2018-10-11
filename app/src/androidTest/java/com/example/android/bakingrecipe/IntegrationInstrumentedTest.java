@@ -16,12 +16,16 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.example.android.bakingrecipe.adapter.IngredientAdapter;
 import com.example.android.bakingrecipe.adapter.StepAdapter;
+import com.example.android.bakingrecipe.model.Ingredient;
 import com.example.android.bakingrecipe.view.MainActivity;
+import com.example.android.bakingrecipe.widget.PersistWidgetData;
+import com.example.android.bakingrecipe.widget.WidgetData;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +37,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.TextView;
+
+import junit.framework.AssertionFailedError;
+
+import java.util.ArrayList;
 
 import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
@@ -61,6 +69,13 @@ import static org.junit.Assert.*;
 public class IntegrationInstrumentedTest {
     private MainActivity mActivity;
     private boolean mIsScreenSw600dp;
+
+    private String[] recipeNames = new String[]{
+            "Nutella Pie",
+            "Brownies",
+            "Yellow Cake",
+            "Cheesecake"
+    };
 
     private String[] ingredientsOfNutellaPie=new String[]{
             "Graham Cracker crumbs",
@@ -210,6 +225,41 @@ public class IntegrationInstrumentedTest {
                 //go back to previous screen
                 Espresso.pressBack();
             }
+        }
+
+
+    }
+
+    @Test
+    public void testPersistWidgetData(){
+        Context context = mActivity.getApplicationContext();
+
+        //Launch the app and navigate to a recipe which will cause its ingredients to be stored in a shared preferences.
+        //Click on the first recipe (Nutella Pie) from mainActivity's recyclerview
+        for(int i=0;i<4;i++){
+            onView(ViewMatchers.withId(R.id.recipeRecyclerView))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(i,
+                            click()));
+
+            //Read back from shared preferences and Assert values
+            WidgetData widgetDataRead;
+            widgetDataRead = PersistWidgetData.readFromSharedPreferences(context);
+
+            if(widgetDataRead.getRecipeName().compareTo(recipeNames[i])==0){
+                //check ingredients for the first item only as it is sufficient to confirm that ingredients are being stored
+                if(i==0){
+                    for(int j=0;j<ingredientsOfNutellaPie.length;j++){
+                        if(!(widgetDataRead.getIngredients().get(j).getIngredient().compareTo(ingredientsOfNutellaPie[j])==0)){
+                            Assert.fail("Ingredients don't match for the recipe:"+recipeNames[i]);
+                        }
+                    }
+                }
+
+            }else{
+                Assert.fail("Recipe name doesn't match!");
+            }
+            Espresso.pressBack();
+
         }
 
     }

@@ -1,35 +1,29 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#09C"
-    android:padding="@dimen/widget_margin">
+    android:orientation="vertical"
+    android:padding="@dimen/widget_margin"
+    android:background="@color/white"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
-        android:id="@+id/appwidget_recipe_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="8dp"
-        android:background="#09C"
-        android:contentDescription="test1"
-        android:text="recipe name"
-        android:textColor="#ffffff"
-        android:textSize="28sp"
-        android:textAllCaps="true"
-        android:textStyle="bold" />
-    <TextView
-        android:id="@+id/appwidget_ingredients"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/appwidget_recipe_name"
-        android:layout_alignParentLeft="true"
-        android:layout_margin="8dp"
-        android:background="#09C"
-        android:contentDescription="test2"
-        android:text="list of ingredients"
-        android:textColor="#ffffff"
-        android:textSize="18sp"
-         />
+        android:layout_gravity="center_vertical"
+        android:textColor="@android:color/white"
+        android:background="@color/colorAccent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold"
+        tools:text="Nuttla Pie's ingredients"
+        android:padding="8dp"
+        android:id="@+id/widget_recipe_name"/>
 
-</RelativeLayout>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        android:id="@+id/widget_ingredients_list">
+
+    </ListView>
+
+</LinearLayout>

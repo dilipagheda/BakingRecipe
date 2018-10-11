@@ -3,6 +3,7 @@ package com.example.android.bakingrecipe.widget;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 
@@ -21,24 +22,13 @@ public class IngradientsAppWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-
-        SharedPreferences prefs = context.getSharedPreferences(RECIPE_WIDGET, MODE_PRIVATE);
-        boolean doesWidgetContainValue = prefs.getBoolean(WIDGET_BOOLEAN_KEY, false);
-        String recipeName="";
-        String ingredients="";
-
-        if(doesWidgetContainValue){
-            recipeName = prefs.getString("RecipeName","");
-            ingredients = prefs.getString("Ingredients","");
-        }
-
-        //  Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingradients_app_widget);
-        // set initial values
-        views.setTextViewText(R.id.appwidget_ingredients, ingredients);
-        views.setTextViewText(R.id.appwidget_recipe_name,recipeName);
-        // Instruct the widget manager to update the widget
+        views.setTextViewText(R.id.widget_recipe_name,PersistWidgetData.readFromSharedPreferences(context).getRecipeName());
+        views.setRemoteAdapter(R.id.widget_ingredients_list,
+                new Intent(context, WidgetService.class));
+
         appWidgetManager.updateAppWidget(appWidgetId, views);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,R.id.widget_ingredients_list);
     }
 
     @Override
@@ -47,6 +37,8 @@ public class IngradientsAppWidget extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
+
     }
 
     @Override

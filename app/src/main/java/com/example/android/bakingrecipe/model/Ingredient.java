@@ -62,6 +62,12 @@ public class Ingredient implements Parcelable{
         ingredient=in.readString();
     }
 
+    public Ingredient(Double quantity, String measure, String ingredient) {
+        this.quantity = quantity;
+        this.measure = measure;
+        this.ingredient = ingredient;
+    }
+
     public static final Parcelable.Creator<Ingredient> CREATOR
             = new Parcelable.Creator<Ingredient>(){
 

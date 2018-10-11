@@ -14,7 +14,7 @@
         android:layout_height="50dp"
         android:layout_width="50dp"
         android:text="1"
-        android:textColor="#000"
+        android:textColor="@color/black"
         android:textSize="20sp"
         android:background="@drawable/circle_white"
         android:gravity="center_vertical|center_horizontal"/>
@@ -27,6 +27,7 @@
         android:textSize="16sp"
         android:layout_marginLeft="8dp"
         tools:text="Recipe Introduction"
+        android:textColor="@color/black"
         android:maxLines="1"
        />
 </LinearLayout>

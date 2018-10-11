@@ -24,6 +24,8 @@ import com.example.android.bakingrecipe.model.Ingredient;
 import com.example.android.bakingrecipe.model.Recipe;
 import com.example.android.bakingrecipe.service.StatusCodes;
 import com.example.android.bakingrecipe.widget.IngradientsAppWidget;
+import com.example.android.bakingrecipe.widget.PersistWidgetData;
+import com.example.android.bakingrecipe.widget.WidgetData;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,13 +34,9 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements ItemClickListener {
 
-    public static final String WIDGET_BOOLEAN_KEY = "w";
-    private static String RECIPE_WIDGET="recipe_widget";
-
     private RecyclerView mRecipeListRecyclerView;
     private RecipeAdapter mRecipeAdapter;
     private BakingViewModel viewModel;
-    private boolean doesWidgetContainValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +53,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         mRecipeAdapter.setClickListener(this);
         mRecipeListRecyclerView.setAdapter(mRecipeAdapter);
 
-        //get the flag from sharedPreferences if the widget was updated with recipe last time
-        SharedPreferences prefs = getSharedPreferences(RECIPE_WIDGET, MODE_PRIVATE);
-        doesWidgetContainValue = prefs.getBoolean(WIDGET_BOOLEAN_KEY, false);
+
 
         //setup observer for list of recipes
         viewModel.getLiveDataObject().observe(this, new Observer<ArrayList<Recipe>>() {
@@ -68,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
                     mRecipeAdapter.notifyDataSetChanged();
 
                     //update the widget to default to first recipe only first time
-                    if(!doesWidgetContainValue){
+                    if(PersistWidgetData.readFromSharedPreferences(getApplicationContext())==null){
                         updateWidget(mRecipeAdapter.getRecipe(0).getName(),mRecipeAdapter.getRecipe(0).getIngredients());
                     }
 
@@ -98,26 +94,16 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         startActivity(i);
     }
 
-    public void updateWidget(String recipeName, ArrayList<Ingredient> ingredients){
-        RemoteViews views = new RemoteViews(getPackageName(), R.layout.ingradients_app_widget);
-        String strIngredients="";
-        for(Ingredient i:ingredients){
-            strIngredients+=i.getIngredient()+" "+String.valueOf(i.getQuantity())+" "+i.getMeasure()+"\n";
-        }
-        views.setTextViewText(R.id.appwidget_ingredients, strIngredients);
-        views.setTextViewText(R.id.appwidget_recipe_name,recipeName);
+    public void updateWidget(String recipeName, ArrayList<Ingredient> ingredients) {
+        WidgetData widgetData = new WidgetData(recipeName,ingredients);
+        PersistWidgetData.writeToSharedPreferences(this,widgetData);
+
+        //trigger the update using broadcast message so that widget gets latest data
+        Intent intent = new Intent(this, IngradientsAppWidget.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         int[] ids = AppWidgetManager.getInstance(getApplication())
-                .getAppWidgetIds(new ComponentName(getApplication(), IngradientsAppWidget.class));
-        if(ids.length>0){
-            AppWidgetManager.getInstance(getApplication()).updateAppWidget(ids,views);
-        }
-        //set the flag from sharedPreferences if the widget was never updated before
-        SharedPreferences.Editor prefsEditor = getSharedPreferences(RECIPE_WIDGET, MODE_PRIVATE).edit();
-        if(!doesWidgetContainValue){
-            prefsEditor.putBoolean(WIDGET_BOOLEAN_KEY,true);
-            prefsEditor.putString("RecipeName",recipeName);
-            prefsEditor.putString("Ingredients",strIngredients);
-            prefsEditor.commit();
-        }
+                .getAppWidgetI‌​ds(new ComponentName(getApplication(), IngradientsAppWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(intent);
     }
 }

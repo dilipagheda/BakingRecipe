@@ -25,8 +25,6 @@ import com.example.android.bakingrecipe.model.Recipe;
  */
 public class RecipeDetailsFragment extends Fragment {
     private static final String ARG_RECIPE = "recipe";
-    private static final String ARG_DUAL = "dual";
-    private boolean isDualMode;
     private Recipe mRecipe;
     private TabLayout tabLayout;
     private RecipeDetailsFragmentBinding recipeDetailsFragmentBinding;
@@ -36,11 +34,10 @@ public class RecipeDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static RecipeDetailsFragment newInstance(Recipe recipe, boolean isDualMode) {
+    public static RecipeDetailsFragment newInstance(Recipe recipe) {
         RecipeDetailsFragment fragment = new RecipeDetailsFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_RECIPE, recipe);
-        args.putBoolean(ARG_DUAL,isDualMode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -50,7 +47,6 @@ public class RecipeDetailsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mRecipe = getArguments().getParcelable(ARG_RECIPE);
-            isDualMode =  getArguments().getBoolean(ARG_DUAL);
         }
 
 
@@ -67,7 +63,6 @@ public class RecipeDetailsFragment extends Fragment {
         adapter = new RecipeDetailsFragmentAdaptor(fm,new String[]{getString(R.string.ingredients_tab),
                 getString(R.string.steps_tab)});
         adapter.setRecipe(mRecipe);
-        adapter.setDualMode(isDualMode);
         viewPager.setAdapter(adapter);
 
         // Give the TabLayout the ViewPager
