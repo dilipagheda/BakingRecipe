@@ -11,3 +11,4 @@ This project is developed as part of the Udacity Nanodegree - Android developer.
 - Uses Andorid's latest feature PIP (Picture in person)
 - Uses PreviewSeekBar library to show frames at a given position 
 - Implements App Widget using ListView to show ingredients of a last visited recipe.
+- Uses Espresso tests to perform automated UI testing 
