@@ -14,7 +14,7 @@ This project is developed as part of the Udacity Nanodegree - Android developer.
 - Uses Espresso tests to perform automated UI testing 
 
 # How to run this project
-1. Download this repo to your local or clone it using this link: 
+1. Download this repo to your local or clone it using this link: https://github.com/dilipagheda/BakingRecipe.git
 2. Open the project in Android Studio.
 3. Compile and run in any emulator of your choice.
 4. If you wish, You can also run it on physical android device.
