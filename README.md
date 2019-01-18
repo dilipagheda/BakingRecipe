@@ -13,6 +13,13 @@ This project is developed as part of the Udacity Nanodegree - Android developer.
 - Implements App Widget using ListView to show ingredients of a last visited recipe.
 - Uses Espresso tests to perform automated UI testing 
 
+# How to run this project
+1. Download this repo to your local or clone it using this link: 
+2. Open the project in Android Studio.
+3. Compile and run in any emulator of your choice.
+4. If you wish, You can also run it on physical android device.
+
+
 # Screenshots
 ## Tablet - Landscape mode
 ![Alt text](/screenshots/Screenshot_1539262400.png?raw=true)  ![Alt text](/screenshots/Screenshot_1539262643.png?raw=true)![Alt text](/screenshots/Screenshot_1539262652.png?raw=true)  
